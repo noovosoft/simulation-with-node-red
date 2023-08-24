@@ -1,0 +1,160 @@
+[
+  {
+    "id": "989d4b860d7e6572",
+    "type": "tab",
+    "label": "Node Exercise",
+    "disabled": false,
+    "info": "",
+    "env": []
+  },
+  {
+    "id": "1e33de9d84537993",
+    "type": "inject",
+    "z": "989d4b860d7e6572",
+    "name": "",
+    "props": [
+      {
+        "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 120,
+    "y": 120,
+    "wires": [
+      [
+        "fe0b14f7f1083e06",
+        "d97b04f82c9e246a"
+      ]
+    ]
+  },
+  {
+    "id": "8664892e55afa19e",
+    "type": "debug",
+    "z": "989d4b860d7e6572",
+    "name": "debug 7",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 640,
+    "y": 240,
+    "wires": []
+  },
+  {
+    "id": "fe0b14f7f1083e06",
+    "type": "function",
+    "z": "989d4b860d7e6572",
+    "name": "temperature",
+    "func": "const key = msg.payload; \nconst currentDate = new Date();\nconst timestamp = currentDate.getTime();\n\nconst temperature = {};\ntemperature[timestamp] = (Math.random() * (45 - 40) + 40).toFixed(0)\n\nmsg.method = \"PATCH\";\nmsg.payload = temperature;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 310,
+    "y": 140,
+    "wires": [
+      [
+        "068b76677dd3b43b"
+      ]
+    ]
+  },
+  {
+    "id": "068b76677dd3b43b",
+    "type": "http request",
+    "z": "989d4b860d7e6572",
+    "name": "",
+    "method": "use",
+    "ret": "txt",
+    "paytoqs": "ignore",
+    "url": "https://node-db-c183e-default-rtdb.firebaseio.com/node-db/temperature.json",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+    "x": 510,
+    "y": 180,
+    "wires": [
+      [
+        "8664892e55afa19e"
+      ]
+    ]
+  },
+  {
+    "id": "0dcc0d468edc0abc",
+    "type": "debug",
+    "z": "989d4b860d7e6572",
+    "name": "debug 8",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 600,
+    "y": 360,
+    "wires": []
+  },
+  {
+    "id": "d97b04f82c9e246a",
+    "type": "function",
+    "z": "989d4b860d7e6572",
+    "name": "voltage",
+    "func": "const key = msg.payload; \nconst voltage = {}\nvoltage[key] = (Math.random() * (35 - 30) + 30).toFixed(0); \n\nmsg.method = \"PATCH\";\nmsg.payload = voltage;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 260,
+    "y": 260,
+    "wires": [
+      [
+        "94b57fd65fe1ab57"
+      ]
+    ]
+  },
+  {
+    "id": "94b57fd65fe1ab57",
+    "type": "http request",
+    "z": "989d4b860d7e6572",
+    "name": "",
+    "method": "use",
+    "ret": "txt",
+    "paytoqs": "ignore",
+    "url": "https://node-db-c183e-default-rtdb.firebaseio.com/node-db/voltage.json",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+    "x": 470,
+    "y": 300,
+    "wires": [
+      [
+        "0dcc0d468edc0abc"
+      ]
+    ]
+  }
+]
