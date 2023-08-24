@@ -1,230 +1,101 @@
-const upperControlLimit = 43
-const upperZoneAHigh = 43
-const upperZoneALow = 42
-const upperZoneBHigh = 42
-const upperZoneBLow = 41
-const upperZoneCHigh = 41
-const upperZoneCLow = 40
-const target = 40
-const lowerZoneCHigh = 40
-const lowerZoneCLow = 39
-const lowerZoneBHigh = 39
-const lowerZoneBLow = 38
-const lowerZoneAHigh = 38
-const lowerZoneALow = 37
-const lowerControlLimit = 37
-const rangeVariance = 3
-const yAxisCount = (upperControlLimit - lowerControlLimit) + (rangeVariance * 2)
-const yAxisActualLength = 360
-const yAxisGap = 360 / yAxisCount
-const xAxisPxLength = 1180
-const xAxisPxStart = 40
-const yAxisPxStart = 40
-const yAxisPxLength = 380
-const xAxisPadding = 380
-const yAxisPadding = 20
-const batchPoints = calculateAverage()
-const xAxisGap = (xAxisPxLength - xAxisPxStart) / batchPoints.length
-function axes(svg) {
-    // x-axis
-    drawLine(svg, {x1: xAxisPxStart, y1: xAxisPadding, x2: xAxisPxLength, y2: yAxisPxLength});
-    // y-axis
-    drawLine(svg, {x1: yAxisPxStart, y1: yAxisPadding, x2: yAxisPxStart, y2: yAxisPxLength});
+const dummy = []
+for(let i = 0; i < 60; i++) {
+    dummy.push((Math.random() * (45 - 30) + 30).toFixed(0))
 }
 
-function calculateAverage() {
-    let batchPoints = []
-    let batchFrequency = []
-    samples.forEach((round)=> {
-        batchPoints[round.batch - 1] = batchPoints[round.batch - 1] === undefined ? round.value : batchPoints[round.batch - 1] + round.value
-        batchFrequency[round.batch - 1] = batchFrequency[round.batch - 1] === undefined ? 1 : batchFrequency[round.batch - 1] + 1
-    })
-    for(let i = 1; i <= batchPoints.length; i++) {
-        batchPoints[i - 1] = (batchPoints[i - 1] / batchFrequency[i - 1]).toFixed(2)
+
+class plot {
+    constructor(points, svg, chartNumber) {
+        this.chartNumber = chartNumber
+        this.svg = svg
+        this.batchPoints = points;
+        this.upperControlLimit = Math.max(...this.batchPoints)
+        this.lowerControlLimit = Math.min(...this.batchPoints)
+        this.rangeVariance = 3
+        this.yAxisCount = (((this.upperControlLimit - this.lowerControlLimit) + (this.rangeVariance * 2)) / 1) + 1
+        this.yAxisGap = 360 / this.yAxisCount
+        this.xAxisPxLength = 1180 //default
+        this.xAxisPxStart = 40 //default
+        this.yAxisPxStart = 40 //default
+        this.yAxisPxLength = 380 //default
+        this.xAxisPadding = 380 //default
+        this.yAxisPadding = 20 //default
+        this.xAxisGap = (this.xAxisPxLength - this.xAxisPxStart) / this.batchPoints.length
     }
-    return batchPoints
-}
-
-function yAxisColor(yAxisNum) {
-    let grid_line_color = "transparent"
-    if(yAxisNum === upperZoneAHigh || yAxisNum === lowerZoneALow) {
-        grid_line_color = "red"
-    }else if(yAxisNum === upperZoneBHigh || yAxisNum === lowerZoneBLow) {
-        grid_line_color = "orange"
-    }else if(yAxisNum === upperZoneCHigh || yAxisNum === lowerZoneCLow) {
-        grid_line_color = "yellow"
-    }else if(yAxisNum === target) {
-        grid_line_color = "black"
+    axes() {
+        // x-axis
+        drawLine(this.svg, {x1: this.xAxisPxStart, y1: this.xAxisPadding, x2: this.xAxisPxLength, y2: this.yAxisPxLength, id: "x-axis"});
+        // y-axis
+        drawLine(this.svg, {x1: this.yAxisPxStart, y1: this.yAxisPadding, x2: this.yAxisPxStart, y2: this.yAxisPxLength, id: "y-axis"});
     }
-    return grid_line_color
-}
+    ticksLabel() {
+        //y-axis
+        for (let i = 1; i <= this.yAxisCount; i++) {
 
-function ticksLabel(svg, totalBatches) {
-    //y-axis
-    for(let i = 1; i <= yAxisCount; i++) {
-        const yAxisNum = (upperControlLimit + rangeVariance) - (i - 1)
-        let grid_line_color = yAxisColor(yAxisNum)
-        //grid line
-        drawLine(svg, {x1: yAxisPxStart, y1: yAxisPadding + yAxisGap * (i - 1), x2: xAxisPxLength, y2: yAxisPadding + yAxisGap * (i - 1), stroke: grid_line_color, strokeType: "dashed"});
-        //axis ticks
-        drawLine(svg, {x1: yAxisPxStart - 4, y1: yAxisPadding + yAxisGap * (i - 1), x2: yAxisPxStart, y2: yAxisPadding + yAxisGap * (i - 1)});
-        //labels
-        drawText(svg, {x: 20, y: 25 + yAxisGap * (i - 1), text: yAxisNum});
+            const yAxisNum = (this.upperControlLimit + this.rangeVariance) - (i - 1) * 1
+            //grid line
+            //drawLine(svg, {x1: yAxisPxStart, y1: yAxisPadding + yAxisGap * (i - 1), x2: xAxisPxLength, y2: yAxisPadding + yAxisGap * (i - 1), strokeType: "dashed"});
+            //axis ticks
+            drawLine(this.svg, {
+                x1: this.yAxisPxStart - 4,
+                y1: this.yAxisPadding + this.yAxisGap * (i - 1),
+                x2: this.yAxisPxStart,
+                y2: this.yAxisPadding + this.yAxisGap * (i - 1)
+            });
+            //labels
+            drawText(this.svg, {x: 20, y: 25 + this.yAxisGap * (i - 1), text: yAxisNum, id: "x-axis" + i});
+        }
+        //x-axis
+        for (let i = 1; i <= this.batchPoints.length; i++) {
+            //grid
+            drawLine(this.svg, {
+                x1: parseInt(this.xAxisPxStart+ 20 + this.xAxisGap * (i - 1)),
+                y1: parseInt(this.yAxisPadding),
+                x2: parseInt(this.xAxisPxStart + 20 + this.xAxisGap * (i - 1)),
+                y2: parseInt(this.xAxisPadding),
+                stroke: '#ccc'
+            });
+            //ticks
+            // drawLine(this.svg, {
+            //     x1: parseInt(this.xAxisPxStart + this.xAxisGap * i),
+            //     y1: parseInt(this.xAxisPadding),
+            //     x2: parseInt(this.xAxisPxStart + this.xAxisGap * i),
+            //     y2: parseInt(this.xAxisPadding + 4)
+            // });
+            //label
+            drawText(this.svg, {x: this.xAxisPxStart - 5 + this.xAxisGap * i, y: this.xAxisPadding + 20, text: i, id: "y-axis" + i});
+        }
     }
-    //x-axis
-    for(let i = 1; i <= totalBatches; i++) {
-        //ticks
-        drawLine(svg, {x1: xAxisPxStart + xAxisGap * i, y1: xAxisPadding, x2: xAxisPxStart + xAxisGap * i, y2: xAxisPadding + 4});
-        //label
-        drawText(svg, {x: xAxisPxStart - 5 + xAxisGap * i, y: xAxisPadding + 20, text: i});
+    plotPoints(batchPoints, color = 'green') {
+        batchPoints.forEach((value, i) => {
+            drawCircle(this.svg, {
+                cx: this.xAxisPxStart + this.yAxisPadding + (i * this.xAxisGap),
+                cy: this.yAxisPxLength - ((value - (this.lowerControlLimit - this.rangeVariance)) * this.yAxisGap),
+                r: 2,
+                fill: color,
+                id: "circle"+ color + this.chartNumber + i
+            });
+        })
+    }
+
+    drawControlPlot(color = "transparent") {
+        this.axes()
+        this.ticksLabel()
+        this.plotPoints(this.batchPoints, color)
+        console.log(this.batchPoints)
+
     }
 }
-
-function plotPoints(svg, batchPoints) {
-    batchPoints.forEach((value, i) => {
-        drawCircle(svg, {
-            cx: xAxisPxStart + yAxisPadding + (i * xAxisGap),
-            cy: yAxisPxLength - ((value - (lowerControlLimit - rangeVariance)) * yAxisGap),
-            r: 2,
-            fill: 'green',
-            id: "circle" + i
-        });
-    })
-}
-
-function drawControlPlot(svg) {
-    axes(svg)
-    ticksLabel(svg, batchPoints.length)
-    plotPoints(svg, batchPoints)
-}
-
 const svg3 = document.getElementById('svg3');
-drawControlPlot(svg3)
+const svg4 = document.getElementById('svg4');
+const svg5 = document.getElementById('svg5');
 
-function changeCircleColor(index, color) {
-    document.getElementById("circle" + index).setAttribute("fill", color);
-}
-function rule1() {
-    batchPoints.forEach((value, i) => {
-        if(value > upperControlLimit || value < lowerControlLimit) {
-            changeCircleColor(i, "red")
-        }
-    })
-}
+const temperatureVoltage = new plot(dummy.slice(-60), svg3, 3)
+temperatureVoltage.drawControlPlot();
 
-function rule2() {
-    let count = 0
-    let decreasing = false
-    for(let i = 1; i < batchPoints.length; i++) {
-        if(batchPoints[i] < batchPoints[i - 1] && decreasing === false) {
-            count = 1
-            decreasing = true
-        }else if(batchPoints[i] > batchPoints[i - 1] && decreasing === true) {
-            count = 1
-            decreasing = false
-        }
-        count++
-        if(count > 5) {
-            count = 0
-            for(let j = i; j > (i - 5); j--) {
-                changeCircleColor(j, "red")
-            }
-        }
-    }
-}
-function markRed(index, totalPoints) {
-    while(totalPoints--) {
-        changeCircleColor(index - totalPoints, "red")
-    }
-}
+const voltageObj = new plot(dummy.slice(-60), svg4, 4)
+voltageObj.drawControlPlot();
 
-function rule3() {
-    let redPoints = []
-    let upper = 0
-    let lower = 0
-    batchPoints.forEach((value, i, array) => {
-        if(value < target) {
-            upper = 0
-            lower++
-        }else if(value > target) {
-            lower = 0
-            upper++
-        }
-        if(upper > 5 || lower > 5) {
-            lower = 0; upper = 0;
-            redPoints.push(i)
-        }
-    })
-    redPoints.forEach((value) => {
-        markRed(value, 5)
-    })
-}
-
-function rule4() {
-    let flag = (batchPoints[0] > target)
-    let count = 0
-    for(let i = 1; i < batchPoints.length; i++) {
-        if(batchPoints[i] < target && flag === true) {
-            flag = false
-            count++
-        }else if (batchPoints[i] > target && flag === false) {
-            flag = true
-            count++
-        }else {
-            count = 0
-        }
-        if(count === 14) {
-            markRed(i, 14)
-        }
-    }
-}
-
-function clearRules() {
-    batchPoints.forEach((value, i) => {
-        changeCircleColor(i, "green")
-    })
-}
-function checkPoints(index, totalPoints, count, upperLimit, lowerLimit) {
-    let upperCount = 0, lowerCount = 0
-    for(let i = index - 1; i >= index - totalPoints; i--) {
-        if(batchPoints[i] > upperLimit) {
-            upperCount++
-        } else if(batchPoints[i] < lowerLimit) {
-            lowerCount++
-        }
-    }
-    return (upperCount >= count || lowerCount >= count)
-}
-function rule5TO6(totalPoints, count, upperLimit, lowerLimit) {
-    for(let i = totalPoints - 1; i < batchPoints.length; i++) {
-        if(checkPoints(i, totalPoints, count, upperLimit, lowerLimit)) {
-            markRed(i, totalPoints)
-            i += totalPoints - 1
-        }
-    }
-}
-function check15Points(index, totalPoints) {
-    for(let i = index; i <  index + totalPoints; i++) {
-        if(batchPoints[i] > upperZoneCHigh || batchPoints[i] < lowerZoneCLow) {
-            return  false
-        }
-    }
-    return true
-}
-function rule7(totalPoints) {
-    for(let i = 0; i < batchPoints.length - totalPoints; i++) {
-        if(check15Points(i, totalPoints)) {
-            markRed((i + totalPoints - 1), totalPoints)
-        }
-    }
-}
-document.getElementById('rule1').addEventListener("click", () => rule1());
-
-document.getElementById('rule2').addEventListener("click", () => rule2());
-document.getElementById('rule3').addEventListener("click", () => rule3());
-document.getElementById('rule4').addEventListener("click", () => rule4());
-document.getElementById('rule5').addEventListener("click", () => rule5TO6(3, 2, upperZoneALow, lowerZoneAHigh));
-document.getElementById('rule6').addEventListener("click", () => rule5TO6(5, 4, upperZoneBLow, lowerZoneBHigh));
-document.getElementById('rule7').addEventListener("click", () => rule7(15));
-
-document.getElementById('clear').addEventListener("click", () => clearRules());
+const temperatureObj = new plot(dummy.slice(-60), svg5, 5)
+temperatureObj.drawControlPlot();
+//drawControlPlot(svg = svg3)

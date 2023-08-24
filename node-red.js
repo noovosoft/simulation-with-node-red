@@ -22,17 +22,27 @@ const db = getDatabase();
 
 const voltageRef = ref(db, 'node-db/voltage');
 onValue(voltageRef, (snapshot) => {
+    let voltage = []
     const data = snapshot.val();
     for(let key in data) {
-        console.log(key + " " + data[key])
+        //console.log(key + " " + data[key])
+        voltage.push(data[key])
     }
+
+    temperatureVoltage.plotPoints(voltage.slice(-60), "red")
+    voltageObj.plotPoints(voltage.slice(-60), "red")
 });
 
 const temperatureRef = ref(db, 'node-db/temperature');
 onValue(temperatureRef, (snapshot) => {
     const data = snapshot.val();
+    let temperature = []
     //console.log(data);
     for(let key in data) {
-        console.log(key + " " + data[key])
+        temperature.push(data[key]);
     }
+    temperatureVoltage.plotPoints(temperature.slice(-60));
+    temperatureObj.plotPoints(temperature.slice(-60));
+    //console.log(temp)
 });
+

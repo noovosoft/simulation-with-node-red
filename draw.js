@@ -1,6 +1,6 @@
 const svgNS = "http://www.w3.org/2000/svg";
 
-function drawLine(svg, {x1 = 0, y1 = 0, x2 = 0, y2 = 0, stroke = 'black', strokeWidth = 1, strokeType = 'solid'}) {
+function drawLine(svg, {x1 = 0, y1 = 0, x2 = 0, y2 = 0, stroke = 'black', strokeWidth = 1, strokeType = 'solid', id = null}) {
     const element = document.createElementNS(svgNS, 'line');
     element.setAttributeNS(null, 'x1', x1.toString());
     element.setAttributeNS(null, 'y1', y1.toString());
@@ -9,6 +9,10 @@ function drawLine(svg, {x1 = 0, y1 = 0, x2 = 0, y2 = 0, stroke = 'black', stroke
     element.setAttributeNS(null, 'stroke', stroke.toString());
     element.setAttributeNS(null, 'stroke-width', strokeWidth.toString());
     element.setAttributeNS(null, 'shape-rendering', 'crispEdges');
+
+    if (id) {
+        element.setAttributeNS(null, 'id', id);
+    }
 
     if (strokeType === 'dashed') {
         element.setAttributeNS(null, 'stroke-dasharray', '4');
@@ -56,13 +60,15 @@ function drawTriangle(svg, {x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0, fill
     svg.appendChild(element);
 }
 
-function drawText(svg, {x = 0, y = 0, text = ''}) {
+function drawText(svg, {x = 0, y = 0, text = '', id = null}) {
     const element = document.createElementNS(svgNS, 'text');
     element.setAttributeNS(null, 'x', x.toString());
     element.setAttributeNS(null, 'y', y.toString());
     element.setAttributeNS(null, 'class', 'svg-text');
     element.textContent = text;
-
+    if (id) {
+        element.setAttributeNS(null, 'id', id);
+    }
     svg.appendChild(element);
 }
 
