@@ -20,29 +20,45 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 
+function  addition(arr, start, end, num) {
+    let sum =0;
+    for(let i =start; i < end; i++) {
+        sum += parseInt(arr[i]);
+    }
+    return (sum / num).toFixed(2);
+}
+function convertAverage(arr, num) {
+    let inputArray = arr
+    inputArray = inputArray.reverse()
+    let avgArr = Array.from(Array(60), () => 0)
+    for(let i = 0; i < 60; i++) {
+        avgArr[i] = addition(inputArray, i * num, (i * num) + num, num);
+    }
+    return avgArr;
+}
 const voltageRef = ref(db, 'node-db/voltage');
 onValue(voltageRef, (snapshot) => {
     let voltage = []
     const data = snapshot.val();
-    for(let key in data) {
+    for(let timeline in data) {
         //console.log(key + " " + data[key])
-        voltage.push(data[key])
+        voltage.push(data[timeline])
     }
 
-    temperatureVoltage.plotPoints(voltage.slice(-60), "red")
-    voltageObj.plotPoints(voltage.slice(-60), "red")
+    const averageVoltage = convertAverage(voltage, 18) //input per 10sec = 18 input/3mins
+    temperatureVoltage.plotPoints(voltage.slice(60), "red")
+    voltageObj.plotPoints(averageVoltage, "red")
 });
 
 const temperatureRef = ref(db, 'node-db/temperature');
 onValue(temperatureRef, (snapshot) => {
     const data = snapshot.val();
     let temperature = []
-    //console.log(data);
-    for(let key in data) {
-        temperature.push(data[key]);
+    for(let timeline in data) {
+        temperature.push(data[timeline]);
     }
-    temperatureVoltage.plotPoints(temperature.slice(-60));
-    temperatureObj.plotPoints(temperature.slice(-60));
-    //console.log(temp)
+    const averageTemperature = convertAverage(temperature, 18)
+    temperatureVoltage.plotPoints(temperature.slice(60));
+    temperatureObj.plotPoints(averageTemperature);
 });
 

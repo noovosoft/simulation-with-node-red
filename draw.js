@@ -10,10 +10,6 @@ function drawLine(svg, {x1 = 0, y1 = 0, x2 = 0, y2 = 0, stroke = 'black', stroke
     element.setAttributeNS(null, 'stroke-width', strokeWidth.toString());
     element.setAttributeNS(null, 'shape-rendering', 'crispEdges');
 
-    if (id) {
-        element.setAttributeNS(null, 'id', id);
-    }
-
     if (strokeType === 'dashed') {
         element.setAttributeNS(null, 'stroke-dasharray', '4');
     }

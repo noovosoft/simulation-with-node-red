@@ -6,6 +6,7 @@ for(let i = 0; i < 60; i++) {
 
 class plot {
     constructor(points, svg, chartNumber) {
+        //console.log(svg.id)
         this.chartNumber = chartNumber
         this.svg = svg
         this.batchPoints = points;
@@ -66,6 +67,31 @@ class plot {
             drawText(this.svg, {x: this.xAxisPxStart - 5 + this.xAxisGap * i, y: this.xAxisPadding + 20, text: i, id: "y-axis" + i});
         }
     }
+    drawLineID(svg, {x1 = 0, y1 = 0, x2 = 0, y2 = 0, stroke = 'black', strokeWidth = 1, strokeType = 'solid', id = null}) {
+        // id = "line"
+        let element = id ? document.getElementById(id) : null;
+
+        if (!element) {
+            element = document.createElementNS(svgNS, 'line');
+        }
+
+        if (id) {
+            element.setAttributeNS(null, 'id', (id));
+        }
+        element.setAttributeNS(null, 'x1', x1.toString());
+        element.setAttributeNS(null, 'y1', y1.toString());
+        element.setAttributeNS(null, 'x2', x2.toString());
+        element.setAttributeNS(null, 'y2', y2.toString());
+        element.setAttributeNS(null, 'stroke', stroke.toString());
+        element.setAttributeNS(null, 'stroke-width', strokeWidth.toString());
+        element.setAttributeNS(null, 'shape-rendering', 'crispEdges');
+
+        if (strokeType === 'dashed') {
+            element.setAttributeNS(null, 'stroke-dasharray', '4');
+        }
+
+        svg.appendChild(element);
+    }
     plotPoints(batchPoints, color = 'green') {
         batchPoints.forEach((value, i) => {
             drawCircle(this.svg, {
@@ -75,6 +101,20 @@ class plot {
                 fill: color,
                 id: "circle"+ color + this.chartNumber + i
             });
+
+        })
+        batchPoints.forEach((value, i) => {
+            if(i > 0) {
+                this.drawLineID(this.svg, {
+                    x1: this.xAxisPxStart + this.yAxisPadding + (i * this.xAxisGap),
+                    y1: this.yAxisPxLength - ((value - (this.lowerControlLimit - this.rangeVariance)) * this.yAxisGap),
+                    x2: this.xAxisPxStart + this.yAxisPadding + ((i - 1)  * this.xAxisGap),
+                    y2: this.yAxisPxLength - ((batchPoints[i - 1] - (this.lowerControlLimit - this.rangeVariance)) * this.yAxisGap),
+                    id: "line"+ color + this.chartNumber + i,
+                    stroke: color
+                })
+
+            }
         })
     }
 
@@ -82,8 +122,6 @@ class plot {
         this.axes()
         this.ticksLabel()
         this.plotPoints(this.batchPoints, color)
-        console.log(this.batchPoints)
-
     }
 }
 const svg3 = document.getElementById('svg3');
@@ -98,4 +136,3 @@ voltageObj.drawControlPlot();
 
 const temperatureObj = new plot(dummy.slice(-60), svg5, 5)
 temperatureObj.drawControlPlot();
-//drawControlPlot(svg = svg3)
