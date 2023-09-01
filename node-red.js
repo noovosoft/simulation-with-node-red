@@ -15,8 +15,6 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase();
 
@@ -38,25 +36,26 @@ function convertAverage(arr, num) {
 }
 const voltageRef = query(ref(db, 'node-db/voltage'), limitToLast(1080));
 onValue(voltageRef, (snapshot) => {
-    let voltage = []
-    const data = snapshot.val();
-    for(let timeline in data) {
-        voltage.push(data[timeline])
-    }
-
-    const averageVoltage = convertAverage(voltage, 18) //input per 10sec = 18 input/3mins
-    temperatureVoltage.plotPoints(voltage.reverse().slice(-60), "red")
-    voltageObj.plotPoints(averageVoltage, "red")
+    console.log(snapshot)
+    // let voltage = []
+    // const data = snapshot.val();
+    // for(let timeline in data) {
+    //     voltage.push(data[timeline])
+    // }
+    //
+    // const averageVoltage = convertAverage(voltage, 18) //input per 10sec = 18 input/3mins
+    // temperatureVoltage.plotPoints(voltage.reverse().slice(-60), "red")
+    // voltageObj.plotPoints(averageVoltage, "red")
 });
 
-const temperatureRef = query(ref(db, 'node-db/temperature'), limitToLast(1080));
-onValue(temperatureRef, (snapshot) => {
-    const data = snapshot.val();
-    let temperature = []
-    for(let timeline in data) {
-        temperature.push(data[timeline]);
-    }
-    const averageTemperature = convertAverage(temperature, 18)
-    temperatureVoltage.plotPoints(temperature.reverse().slice(-60));
-    temperatureObj.plotPoints(averageTemperature);
-});
+// const temperatureRef = query(ref(db, 'node-db/temperature'), limitToLast(1080));
+// onValue(temperatureRef, (snapshot) => {
+//     const data = snapshot.val();
+//     let temperature = []
+//     for(let timeline in data) {
+//         temperature.push(data[timeline]);
+//     }
+//     const averageTemperature = convertAverage(temperature, 18)
+//     temperatureVoltage.plotPoints(temperature.reverse().slice(-60));
+//     temperatureObj.plotPoints(averageTemperature);
+// });
