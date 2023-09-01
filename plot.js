@@ -47,7 +47,7 @@ class plot {
                 y2 : this.yAxisPadding + this.yAxisGap * (i - 1)
             });
             //labels
-            drawText (this.svg, {x : 20, y : 25 + this.yAxisGap * (i - 1), text : yAxisNum, id : "x-axis" + i});
+            drawText (this.svg, {x : 20, y : 25 + this.yAxisGap * (i - 1), text : yAxisNum, id : "x-axis"+this.chartNumber + i});
         }
         //x-axis
         for ( let i = 1; i <= this.batchPoints.length; i++ ) {
@@ -65,7 +65,7 @@ class plot {
                 x : this.xAxisPxStart - 5 + this.xAxisGap * i,
                 y : this.xAxisPadding + 20,
                 text : sec[i]+" ",
-                id : "y-axis-sec" + i
+                id : "y-axis-sec"+this.chartNumber + i
             });
 
         drawText (this.svg,
@@ -73,7 +73,7 @@ class plot {
                 x : this.xAxisPxStart - 5 + this.xAxisGap * i,
                 y : this.xAxisPadding + 40,
                 text : min[i]+" ",
-                id : "y-axis-min" + i
+                id : "y-axis-min"+this.chartNumber + i
             });
 
         drawText (this.svg,
@@ -81,7 +81,7 @@ class plot {
                 x : this.xAxisPxStart - 5 + this.xAxisGap * i,
                 y : this.xAxisPadding + 60,
                 text : hours[i]+" ",
-                id : "y-axis-hour" + i
+                id : "y-axis-hour"+this.chartNumber + i
             });
 
     }

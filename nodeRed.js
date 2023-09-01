@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
-import {getDatabase, ref, get, onValue, child} from "https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js";
+import {getDatabase,query,limitToLast, ref, get, onValue, child} from "https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -37,41 +37,44 @@ function convertAverage(arr, num) {
     }
     return avgArr;
 }
-const voltageRef = ref(db, 'node-db/voltage');
-
+const voltageRef = query(ref(db, 'node-db/voltage'), limitToLast(1080));
 let mins = [];
 let seconds = [];
 let hours =[]
+let avgMins =[];
+let avgSeconds = [];
+let avgHours =[];
 onValue(voltageRef, (snapshot) => {
     let voltage = []
 
     const data = snapshot.val();
+    let count = 0;
     for(let timeline in data) {
         voltage.push (data[timeline])
+        console.log("timeline : "+timeline);
         let date = new Date (parseInt (timeline));
         let min = date.getMinutes ()
         let sec = date.getSeconds ()
         mins.push (min);
         seconds.push (sec);
         hours.push(date.getHours());
-        // console.log(" ")
-        // console.log(min + ":"+sec +" ");
+        if(count === 18) {
+            avgMins.push(min);
+            avgSeconds.push(sec);
+            avgHours.push(date.getHours());
+            count = 0;
+        }
+        count++;
     }
-    let i =mins.length;
-    let j = 0;
-    while(j != 60) {
-        console.log (seconds[i] + " : "+mins[i] +" : "+hours[i]);
-        i--;
-        j++;
-    }
+
     const averageVoltage = convertAverage(voltage, 18)
     temperatureVoltage.plotPoints(voltage.reverse().slice(-60), "red")//input per 10sec = 18 input/3mins
     temperatureVoltage.ticksLabel(seconds.slice(-60),mins.slice(-60) , hours.slice(-60))
     voltageObj.plotPoints(averageVoltage, "red")
-    voltageObj.ticksLabel( seconds.slice(-60),mins.slice(-60) ,hours.slice(-60))
+    voltageObj.ticksLabel( avgSeconds.slice(-60),avgMins.slice(-60) ,avgHours.slice(-60))
 });
 
-const temperatureRef = ref(db, 'node-db/temperature');
+const temperatureRef = query(ref(db, 'node-db/temperature'), limitToLast(1080));
 onValue(temperatureRef, (snapshot) => {
     const data = snapshot.val();
     let temperature = []
@@ -81,6 +84,6 @@ onValue(temperatureRef, (snapshot) => {
     const averageTemperature = convertAverage(temperature, 18)
     temperatureVoltage.plotPoints(temperature.reverse().slice(-60));
     temperatureObj.plotPoints(averageTemperature);
-    temperatureObj.ticksLabel( seconds.slice(-60),mins.slice(-60) ,hours.slice(-60))
+    temperatureObj.ticksLabel(avgSeconds.slice(-60),avgMins.slice(-60) ,avgHours.slice(-60))
 });
 
